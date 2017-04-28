@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/ic_home"
+        android:title="@string/title_home"/>
+
+    <item
+        android:id="@+id/navigation_radar"
+        android:icon="@drawable/ic_radar"
+        android:title="@string/title_radar"/>
+
+    <item
+        android:id="@+id/navigation_metartaf"
+        android:icon="@drawable/ic_order"
+        android:title="@string/title_metartaf"/>
+
+    <item
+        android:id="@+id/navigation_vhsk"
+        android:icon="@drawable/ic_windsock"
+        android:title="@string/title_vhsk"/>
+
+    <item
+        android:id="@+id/navigation_localaviation"
+        android:icon="@drawable/ic_airport"
+        android:title="@string/title_localaviation"/>
+
+</menu>

@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Aviation HK</string>
+    <string name="title_home">Overview</string>
+    <string name="title_vhsk">VHSK</string>
+    <string name="title_metartaf">METAR/TAF</string>
+    <string name="title_radar">Radar/Cam</string>
+    <string name="title_localaviation">Local</string>
+    <string name="downloading_from_hko">Downloading from HKO...</string>
+</resources>
