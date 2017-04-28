@@ -38,8 +38,12 @@ import com.sonnychen.aviationhk.utils.SimpleCache;
 import java.io.IOException;
 
 public class BaseApplication extends Application {
+    public static final int RADAR_FRAME_DURATION = 300;
+    public static final int CACHE_EXPIRY_SECONDS = 600;
+
     public static final String SYNC_EVENT = "SYNC";
     public static final String SYNC_EVENT_PARAM = "EVENT";
+
     public static HKOData Data;
     public static SimpleCache Cache;
     // Called when the application is starting, before any other application objects have been created.
@@ -56,6 +60,11 @@ public class BaseApplication extends Application {
         }
 
         BaseApplication.Data = new HKOData(this, new HKOData.BasicSyncCallback() {
+            @Override
+            public void onProgressUpdate(HKOData.DataType dataType, int progress, int max) {
+
+            }
+
             @Override
             public void onSyncFinished(HKOData.DataType dataType, boolean success) {
                 Intent intent = new Intent(SYNC_EVENT);

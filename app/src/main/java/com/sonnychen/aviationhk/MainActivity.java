@@ -1,23 +1,23 @@
 /**
- This file is part of AviationHK - companion app for local pilots
- that provides at-a-glance weather information.
-
- Project site: https://github.com/sonny-chen/aviation-weather-android
-
- AviationHK is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- AviationHK is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with AviationHK.  If not, see <http://www.gnu.org/licenses/>.
-
- Created by Sonny Chen on 4/25/2017.
+ * This file is part of AviationHK - companion app for local pilots
+ * that provides at-a-glance weather information.
+ * <p>
+ * Project site: https://github.com/sonny-chen/aviation-weather-android
+ * <p>
+ * AviationHK is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * AviationHK is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with AviationHK.  If not, see <http://www.gnu.org/licenses/>.
+ * <p>
+ * Created by Sonny Chen on 4/25/2017.
  **/
 
 package com.sonnychen.aviationhk;
@@ -35,6 +35,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -74,6 +75,25 @@ public class MainActivity extends AppCompatActivity implements
 
         if (BaseApplication.Data.METAR_Code != null && !BaseApplication.Data.METAR_Code.isEmpty())
             bindUI();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.main_menu_about:
+                startActivity(new Intent(this, AboutActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void bindUI() {

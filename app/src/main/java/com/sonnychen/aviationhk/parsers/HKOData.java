@@ -1,23 +1,23 @@
 /**
- This file is part of AviationHK - companion app for local pilots
- that provides at-a-glance weather information.
-
- Project site: https://github.com/sonny-chen/aviation-weather-android
-
- AviationHK is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- AviationHK is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with AviationHK.  If not, see <http://www.gnu.org/licenses/>.
-
- Created by Sonny Chen on 4/25/2017.
+ * This file is part of AviationHK - companion app for local pilots
+ * that provides at-a-glance weather information.
+ * <p>
+ * Project site: https://github.com/sonny-chen/aviation-weather-android
+ * <p>
+ * AviationHK is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * AviationHK is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with AviationHK.  If not, see <http://www.gnu.org/licenses/>.
+ * <p>
+ * Created by Sonny Chen on 4/25/2017.
  **/
 
 package com.sonnychen.aviationhk.parsers;
@@ -50,9 +50,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class HKOData {
-    public static final int RADAR_FRAME_DURATION = 300;
-    public static final int CACHE_EXPIRY_SECONDS = 600;
-
+    public Date METAR_Timestamp;
     public String METAR_Date;
     public String METAR_Code;
     public String METAR_Wind;
@@ -65,15 +63,22 @@ public class HKOData {
     public String METAR_QNH;
     public String METAR_HTML;
     public ArrayList<Pair<String, String>> METAR_Data;
+
+    public Date TAF_Timestamp;
     public String TAF_Date;
     public String TAF_Code;
     public String TAF_HTML;
     public ArrayList<Pair<String, String>>[] TAF_Data;
+
+    public Date SIGMET_Timestamp;
     public String SIGMET_Date;
     public String SIGMET_Code;
+
+    public Date LocalAviationForecast_Timestamp;
     public String LocalAviationForecast_Date;
     public String LocalAviationForecast_Code;
 
+    public Date RADAR_Timestamp;
     public ArrayList<String> Radar_Animation64URLs; // dynamic
     public ArrayList<String> Radar_Animation128URLs; // dynamic
     public ArrayList<String> Radar_Animation256URLs; // dynamic
@@ -86,14 +91,15 @@ public class HKOData {
 
     //define callback interface
     public interface BasicSyncCallback {
+        void onProgressUpdate(DataType dataType, int progress, int max);
         void onSyncFinished(DataType dataType, boolean success);
     }
 
     public enum DataType {
-        METAR, TAF, SIGMET, LOCAL, RADAR
+        METAR, TAF, SIGMET, LOCAL, RADAR, RADAR64, RADAR128, RADAR256
     }
 
-    public HKOData(Context context, final BasicSyncCallback callback) {
+    public HKOData(final Context context, final BasicSyncCallback callback) {
 
         // initialize static urls (static links require no parsing)
         WeatherPhotoURLs = new ArrayList<>();
@@ -136,31 +142,44 @@ public class HKOData {
         new FillMETARCodeTask() {
             @Override
             protected void onPostExecute(Void data) {
+                METAR_Timestamp = new Date();
                 callback.onSyncFinished(DataType.METAR, METAR_Code != null && !METAR_Code.isEmpty());
             }
         }.execute();
         new FillTAFCodeTask() {
             @Override
             protected void onPostExecute(Void data) {
+                TAF_Timestamp = new Date();
                 callback.onSyncFinished(DataType.TAF, TAF_Code != null && !TAF_Code.isEmpty());
             }
         }.execute();
         new FillSIGMETCodeTask() {
             @Override
             protected void onPostExecute(Void data) {
+                SIGMET_Timestamp = new Date();
                 callback.onSyncFinished(DataType.SIGMET, SIGMET_Code != null && !SIGMET_Code.isEmpty());
             }
         }.execute();
         new FillLocalCodeTask() {
             @Override
             protected void onPostExecute(Void data) {
+                LocalAviationForecast_Timestamp = new Date();
                 callback.onSyncFinished(DataType.LOCAL, LocalAviationForecast_Code != null && !LocalAviationForecast_Code.isEmpty());
             }
         }.execute();
-        new FillRadarAnimationURLsTask(context) {
+        new FillRadarAnimationURLsTask() {
             @Override
             protected void onPostExecute(Void data) {
+                RADAR_Timestamp = new Date();
                 callback.onSyncFinished(DataType.RADAR, Radar_Animation64URLs != null && Radar_Animation64URLs.size() > 0);
+
+                // download 64km range radar sequence
+                new DownloadRadarImagesTask(context, DataType.RADAR64, HKOData.this, callback) {
+                    @Override
+                    protected void onPostExecute(Boolean success) {
+                        if (success) callback.onSyncFinished(DataType.RADAR, Radar_Animation64URLs != null && Radar_Animation64URLs.size() > 0);
+                    }
+                }.execute();
             }
         }.execute();
     }
@@ -414,12 +433,6 @@ public class HKOData {
     }
 
     private class FillRadarAnimationURLsTask extends AsyncTask<Void, Integer, Void> {
-        Context context;
-
-        public FillRadarAnimationURLsTask(Context context) {
-            this.context = context;
-        }
-
         protected Void doInBackground(Void... params) {
             try {
                 //        www.hko.gov.hk/wxinfo/radars/radar_range1.htm
@@ -447,34 +460,16 @@ public class HKOData {
                 Radar_Animation128URLs = new ArrayList<>();
                 Radar_Animation256URLs = new ArrayList<>();
 
-                // build animation
-                Radar_Animation64 = new AnimationDrawable();
-                Radar_Animation64.setOneShot(false);
-                Radar_Animation128 = new AnimationDrawable();
-                Radar_Animation128.setOneShot(false);
-                Radar_Animation256 = new AnimationDrawable();
-                Radar_Animation256.setOneShot(false);
-
                 String data_raw = HTML.substring(startPos, endPos);
                 String[] lines = data_raw.split("\n");
                 for (String line : lines) {
                     line = "http://www.hko.gov.hk/wxinfo/radars/" + line.split("\"")[1].trim();
-                    if (line.contains("_256_")) {
+                    if (line.contains("_256_"))
                         Radar_Animation256URLs.add(line);
-                        Bitmap bitmap = DownloadImage(line);
-                        if (bitmap != null)
-                            Radar_Animation256.addFrame(new BitmapDrawable(context.getResources(), bitmap), RADAR_FRAME_DURATION);
-                    } else if (line.contains("_128_")) {
+                    else if (line.contains("_128_"))
                         Radar_Animation128URLs.add(line);
-                        Bitmap bitmap = DownloadImage(line);
-                        if (bitmap != null)
-                            Radar_Animation128.addFrame(new BitmapDrawable(context.getResources(), bitmap), RADAR_FRAME_DURATION);
-                    } else if (line.contains("_064_")) {
+                    else if (line.contains("_064_"))
                         Radar_Animation64URLs.add(line);
-                        Bitmap bitmap = DownloadImage(line);
-                        if (bitmap != null)
-                            Radar_Animation64.addFrame(new BitmapDrawable(context.getResources(), bitmap), RADAR_FRAME_DURATION);
-                    }
                 }
 
                 Log.v("Parser-Radar", Radar_Animation256URLs.toString());
@@ -490,45 +485,4 @@ public class HKOData {
         }
     }
 
-    private static Bitmap DownloadImage(String url) throws IOException {
-        SimpleCache.BitmapEntry cache = BaseApplication.Cache.getBitmap(url);
-        Date expiry = new Date(System.currentTimeMillis() - CACHE_EXPIRY_SECONDS * 1000); // 10 minutes
-        if (cache != null && cache.getMetadata() != null && cache.getMetadata().containsKey("Date") && ((Date) cache.getMetadata().get("Date")).compareTo(expiry) >= 0) {
-            System.out.println("Cache Found: " + url);
-            return cache.getBitmap();
-        }
-
-        URL link = new URL(url);
-        URLConnection connection = link.openConnection();
-        connection.connect();
-        // getting file length
-        int lengthOfFile = connection.getContentLength();
-        InputStream input = connection.getInputStream();
-        byte data[] = new byte[4096];
-        byte fileData[] = new byte[lengthOfFile];
-        int total = 0;
-        int count;
-        while ((count = input.read(data)) != -1) {
-            System.arraycopy(data, 0, fileData, total, count);
-            total += count;
-        }
-
-        Bitmap image = BitmapFactory.decodeByteArray(fileData, 0, lengthOfFile);
-
-        if (image == null) {
-            Log.wtf("DownloadImage", "Decode ERROR: " + url);
-            return null;
-        }
-
-        Map<String, Date> meta = new HashMap<>();
-        meta.put("Date", new Date());
-        OutputStream stream = BaseApplication.Cache.openStream(url, meta);
-        //image.compress(Bitmap.CompressFormat.JPEG, 100, stream); // causes getBitmap() to fail
-        stream.write(fileData);
-        stream.flush();
-        stream.close();
-        System.out.println("Cached " + url);
-
-        return image;
-    }
 }

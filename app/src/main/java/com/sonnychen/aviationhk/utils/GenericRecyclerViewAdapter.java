@@ -74,8 +74,9 @@ public class GenericRecyclerViewAdapter extends RecyclerView.Adapter<GenericRecy
         //Render image using Picasso library
         if (!TextUtils.isEmpty(feedItem.ImageURL)) {
             // special cases: animations
-            if (feedItem.ImageURL.contains("/radar/R1") && BaseApplication.Data.Radar_Animation64 != null &&
-                    BaseApplication.Data.Radar_Animation64.getNumberOfFrames() > 0) {
+            if (feedItem.ImageURL.contains("/radar/R1")
+                    && BaseApplication.Data.Radar_Animation64 != null
+                    && BaseApplication.Data.Radar_Animation64.getNumberOfFrames() > 0) {
                 customViewHolder.progressBar.setVisibility(View.GONE);
                 customViewHolder.imageView.setImageDrawable(BaseApplication.Data.Radar_Animation64);
                 BaseApplication.Data.Radar_Animation64.start();
@@ -86,15 +87,21 @@ public class GenericRecyclerViewAdapter extends RecyclerView.Adapter<GenericRecy
 
                         @Override
                         public void onDownloadStarting() {
-//                            customViewHolder.progressBar.setVisibility(View.VISIBLE);
-//                            customViewHolder.progressBar.setIndeterminate(true);
+                            if (customViewHolder.imageView.getTag() == null || !customViewHolder.imageView.getTag().equals(feedItem.ImageURL))
+                                return;
+
+                            customViewHolder.progressBar.setVisibility(View.VISIBLE);
+                            customViewHolder.progressBar.setIndeterminate(true);
                         }
 
                         @Override
                         public void onDownloadProgress(int bytesReceived, int bytesTotal) {
-//                            customViewHolder.progressBar.setIndeterminate(false);
-//                            customViewHolder.progressBar.setMax(bytesTotal);
-//                            customViewHolder.progressBar.setProgress(bytesReceived);
+                            if (customViewHolder.imageView.getTag() == null || !customViewHolder.imageView.getTag().equals(feedItem.ImageURL))
+                                return;
+
+                            customViewHolder.progressBar.setIndeterminate(false);
+                            customViewHolder.progressBar.setMax(bytesTotal);
+                            customViewHolder.progressBar.setProgress(bytesReceived);
                         }
 
                         @Override

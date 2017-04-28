@@ -38,7 +38,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sonnychen.aviationhk.parsers.HKOData.CACHE_EXPIRY_SECONDS;
+import static com.sonnychen.aviationhk.BaseApplication.CACHE_EXPIRY_SECONDS;
 
 public class AsyncImageTask extends AsyncTask<URL, Integer, Bitmap[]> {
     //define callback interface

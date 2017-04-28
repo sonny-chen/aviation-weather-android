@@ -27,6 +27,10 @@ import android.net.Uri;
 import android.support.v4.app.Fragment;
 
 public class CustomFragmentBase extends Fragment {
+    public void refreshView() {
+        throw new RuntimeException("Stub!");
+    }
+
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);

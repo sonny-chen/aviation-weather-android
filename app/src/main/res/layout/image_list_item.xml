@@ -30,7 +30,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:adjustViewBounds="true"
-            android:background="@color/colorPrimaryDark"
             android:scaleType="fitCenter"/>
 
         <TextView

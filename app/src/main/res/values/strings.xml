@@ -1,9 +1,15 @@
 <resources>
-    <string name="app_name">Aviation HK</string>
+    <string name="app_name">Aviation Hong Kong</string>
     <string name="title_home">Overview</string>
     <string name="title_vhsk">VHSK</string>
     <string name="title_metartaf">METAR/TAF</string>
     <string name="title_radar">Radar/Cam</string>
     <string name="title_localaviation">Local</string>
-    <string name="downloading_from_hko">Downloading from HKO...</string>
+    <string name="downloading_from_hko">Downloading from HKO…</string>
+    <string name="downloading_radar_image_sequence">Downloading radar image sequence</string>
+    <string name="companion_app_for_local_pilots">companion app for local pilots</string>
+    <string name="disclaimer">All weather charts and data are owned by and downloaded from Hong Kong Observatory</string>
+    <string name="open_source_project_site">Open source project site:</string>
+    <string name="project_url">https://github.com/sonny-chen/aviation-weather-android</string>
+    <string name="about">About</string>
 </resources>
