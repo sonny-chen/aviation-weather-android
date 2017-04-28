@@ -1,10 +1,5 @@
 package com.sonnychen.aviationhk.utils;
 
-/**
- * Created by Sonny on 4/27/2017.
- */
-
-
 /*
  * TouchImageView.java
  * By: Michael Ortiz

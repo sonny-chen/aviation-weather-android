@@ -8,11 +8,11 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <com.sonnychen.metarhk.utils.ExtendedViewPager
+    <com.sonnychen.aviationhk.utils.ExtendedViewPager
         android:id="@+id/lightbox"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true">
-    </com.sonnychen.metarhk.utils.ExtendedViewPager>
+    </com.sonnychen.aviationhk.utils.ExtendedViewPager>
 
 </FrameLayout>
