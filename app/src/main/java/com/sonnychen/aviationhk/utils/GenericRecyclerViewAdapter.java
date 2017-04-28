@@ -1,4 +1,4 @@
-package com.sonnychen.metarhk.utils;
+package com.sonnychen.aviationhk.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,10 +13,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.sonnychen.metarhk.AsyncImageTask;
-import com.sonnychen.metarhk.BaseApplication;
-import com.sonnychen.metarhk.LightboxActivity;
-import com.sonnychen.metarhk.R;
+import com.sonnychen.aviationhk.AsyncImageTask;
+import com.sonnychen.aviationhk.BaseApplication;
+import com.sonnychen.aviationhk.LightboxActivity;
+import com.sonnychen.aviationhk.R;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;

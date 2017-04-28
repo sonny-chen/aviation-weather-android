@@ -1,4 +1,4 @@
-package com.sonnychen.metarhk.views;
+package com.sonnychen.aviationhk.views;
 
 import android.content.Context;
 import android.net.Uri;

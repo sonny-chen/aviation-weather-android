@@ -1,4 +1,4 @@
-package com.sonnychen.metarhk.views;
+package com.sonnychen.aviationhk.views;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,9 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.sonnychen.metarhk.BaseApplication;
-import com.sonnychen.metarhk.R;
-import com.sonnychen.metarhk.utils.Utils;
+import com.sonnychen.aviationhk.BaseApplication;
+import com.sonnychen.aviationhk.R;
+import com.sonnychen.aviationhk.utils.Utils;
 
 /**
  * A simple {@link Fragment} subclass.

@@ -1,10 +1,10 @@
-package com.sonnychen.metarhk;
+package com.sonnychen.aviationhk;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 
-import com.sonnychen.metarhk.utils.SimpleCache;
+import com.sonnychen.aviationhk.utils.SimpleCache;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sonnychen.metarhk.parsers.HKOData.CACHE_EXPIRY_SECONDS;
+import static com.sonnychen.aviationhk.parsers.HKOData.CACHE_EXPIRY_SECONDS;
 
 /**
  * Created by Sonny on 4/24/2017.

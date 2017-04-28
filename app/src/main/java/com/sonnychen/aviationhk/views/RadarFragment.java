@@ -1,4 +1,4 @@
-package com.sonnychen.metarhk.views;
+package com.sonnychen.aviationhk.views;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,10 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.sonnychen.metarhk.BaseApplication;
-import com.sonnychen.metarhk.utils.GenericCardItem;
-import com.sonnychen.metarhk.utils.GenericRecyclerViewAdapter;
-import com.sonnychen.metarhk.R;
+import com.sonnychen.aviationhk.BaseApplication;
+import com.sonnychen.aviationhk.utils.GenericCardItem;
+import com.sonnychen.aviationhk.utils.GenericRecyclerViewAdapter;
+import com.sonnychen.aviationhk.R;
 
 import java.util.ArrayList;
 
@@ -22,11 +22,11 @@ import java.util.ArrayList;
  * Activities that contain this fragment must implement the
  * {@link CustomFragmentBase.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link VHSKFragment#newInstance} factory method to
+ * Use the {@link RadarFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class VHSKFragment extends CustomFragmentBase {
-    public VHSKFragment() {
+public class RadarFragment extends CustomFragmentBase {
+    public RadarFragment() {
         // Required empty public constructor
     }
 
@@ -34,10 +34,10 @@ public class VHSKFragment extends CustomFragmentBase {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment VHSKFragment.
+     * @return A new instance of fragment RadarFragment.
      */
-    public static VHSKFragment newInstance() {
-        return new VHSKFragment();
+    public static RadarFragment newInstance() {
+        return new RadarFragment();
     }
 
     private ArrayList<GenericCardItem> cardList;
@@ -52,14 +52,19 @@ public class VHSKFragment extends CustomFragmentBase {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_vhsk, container, false);
+        View view = inflater.inflate(R.layout.fragment_radar, container, false);
         RecyclerView mListView = (RecyclerView) view.findViewById(R.id.listView);
 
         cardList.clear();
-        for (Pair<String, String> cam : BaseApplication.Data.VHSKChartURLs)
+        for (Pair<String, String> cam : BaseApplication.Data.WeatherPhotoURLs) {
             cardList.add(new GenericCardItem(cam.first, cam.second, cam.first));
+        }
 
-        mListView.setLayoutManager(new GridLayoutManager(getContext(), 1, LinearLayoutManager.VERTICAL, false));
+        GridLayoutManager mLayoutManager = new GridLayoutManager(getContext(), 2, LinearLayoutManager.VERTICAL, false);
+        mLayoutManager.setAutoMeasureEnabled(true);
+        mLayoutManager.setMeasurementCacheEnabled(false);
+        mListView.setLayoutManager(mLayoutManager);
+        mListView.setHasFixedSize(false);
         mListView.setAdapter(new GenericRecyclerViewAdapter(getContext(), cardList));
         return view;
     }

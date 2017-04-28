@@ -1,6 +1,5 @@
-package com.sonnychen.metarhk.utils;
+package com.sonnychen.aviationhk.utils;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
@@ -10,8 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.sonnychen.metarhk.AsyncImageTask;
-import com.sonnychen.metarhk.R;
+import com.sonnychen.aviationhk.AsyncImageTask;
+import com.sonnychen.aviationhk.R;
 
 import java.net.MalformedURLException;
 

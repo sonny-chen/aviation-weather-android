@@ -1,4 +1,4 @@
-package com.sonnychen.metarhk.utils;
+package com.sonnychen.aviationhk.utils;
 
 /**
  * Created by Sonny on 4/27/2017.

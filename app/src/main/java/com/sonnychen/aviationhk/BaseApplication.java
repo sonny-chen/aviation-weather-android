@@ -1,4 +1,4 @@
-package com.sonnychen.metarhk;
+package com.sonnychen.aviationhk;
 
 /**
  * Created by Sonny on 4/25/2017.
@@ -10,8 +10,8 @@ import android.content.res.Configuration;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.sonnychen.metarhk.parsers.HKOData;
-import com.sonnychen.metarhk.utils.SimpleCache;
+import com.sonnychen.aviationhk.parsers.HKOData;
+import com.sonnychen.aviationhk.utils.SimpleCache;
 
 import java.io.IOException;
 

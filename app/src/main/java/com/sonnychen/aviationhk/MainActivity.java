@@ -1,4 +1,4 @@
-package com.sonnychen.metarhk;
+package com.sonnychen.aviationhk;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,21 +14,19 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.sonnychen.metarhk.parsers.HKOData;
-import com.sonnychen.metarhk.utils.BottomNavigationViewHelper;
-import com.sonnychen.metarhk.views.CustomFragmentBase;
-import com.sonnychen.metarhk.views.HomeFragment;
-import com.sonnychen.metarhk.views.LocalFragment;
-import com.sonnychen.metarhk.views.MetarFragment;
-import com.sonnychen.metarhk.views.RadarFragment;
-import com.sonnychen.metarhk.views.VHSKFragment;
+import com.sonnychen.aviationhk.parsers.HKOData;
+import com.sonnychen.aviationhk.views.CustomFragmentBase;
+import com.sonnychen.aviationhk.views.HomeFragment;
+import com.sonnychen.aviationhk.views.LocalFragment;
+import com.sonnychen.aviationhk.views.MetarFragment;
+import com.sonnychen.aviationhk.views.RadarFragment;
+import com.sonnychen.aviationhk.views.VHSKFragment;
 
 public class MainActivity extends AppCompatActivity implements
         CustomFragmentBase.OnFragmentInteractionListener {

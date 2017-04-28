@@ -1,4 +1,4 @@
-package com.sonnychen.metarhk; /**
+package com.sonnychen.aviationhk; /**
  * Created by Sonny on 4/27/2017.
  */
 
@@ -17,8 +17,8 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.sonnychen.metarhk.utils.ExtendedViewPager;
-import com.sonnychen.metarhk.utils.TouchImageView;
+import com.sonnychen.aviationhk.utils.ExtendedViewPager;
+import com.sonnychen.aviationhk.utils.TouchImageView;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;

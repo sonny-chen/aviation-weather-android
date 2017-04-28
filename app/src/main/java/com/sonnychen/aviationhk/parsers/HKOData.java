@@ -1,4 +1,4 @@
-package com.sonnychen.metarhk.parsers;
+package com.sonnychen.aviationhk.parsers;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,8 +10,8 @@ import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.sonnychen.metarhk.BaseApplication;
-import com.sonnychen.metarhk.utils.SimpleCache;
+import com.sonnychen.aviationhk.BaseApplication;
+import com.sonnychen.aviationhk.utils.SimpleCache;
 
 import java.io.BufferedReader;
 import java.io.IOException;
