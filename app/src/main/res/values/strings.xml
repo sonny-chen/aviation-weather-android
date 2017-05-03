@@ -12,4 +12,16 @@
     <string name="open_source_project_site">Open source project site:</string>
     <string name="project_url">https://github.com/sonny-chen/aviation-weather-android</string>
     <string name="about">About</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="qnh">QNH</string>
+    <string name="cloud">Cloud</string>
+    <string name="weather">Weather</string>
+    <string name="visibility">Visibility</string>
+    <string name="wind">Wind</string>
+    <string name="current_weather">Current Weather</string>
+    <string name="local_forecast">Local Forecast</string>
+    <string name="extended_forecast">Extended Forecast</string>
+    <string name="weather_warnings">Weather Warnings</string>
 </resources>
