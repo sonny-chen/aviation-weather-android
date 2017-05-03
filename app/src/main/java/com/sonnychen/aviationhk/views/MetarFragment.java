@@ -52,7 +52,6 @@ public class MetarFragment extends CustomFragmentBase {
      *
      * @return A new instance of fragment MetarFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static MetarFragment newInstance() {
         return new MetarFragment();
     }

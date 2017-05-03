@@ -283,6 +283,10 @@ public class SimpleCache {
             return snapshot.getInputStream(VALUE_IDX);
         }
 
+        public long getLength() {
+            return snapshot.getLength(VALUE_IDX);
+        }
+
         public Map<String, Serializable> getMetadata() {
             return metadata;
         }

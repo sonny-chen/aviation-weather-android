@@ -46,6 +46,10 @@ public class BaseApplication extends Application {
 
     public static HKOData Data;
     public static SimpleCache Cache;
+
+    // user settings
+    public static String HKACPassword;
+
     // Called when the application is starting, before any other application objects have been created.
     // Overriding this method is totally optional!
     @Override
