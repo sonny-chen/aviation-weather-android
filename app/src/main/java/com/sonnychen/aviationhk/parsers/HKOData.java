@@ -33,6 +33,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.sonnychen.aviationhk.BaseApplication;
+import com.sonnychen.aviationhk.parsers.BasicSyncCallback.DataType;
 import com.sonnychen.aviationhk.utils.SimpleCache;
 
 import java.io.BufferedReader;
@@ -48,6 +49,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import static com.sonnychen.aviationhk.utils.DownloadUtils.readStream;
 
 public class HKOData {
     public Date METAR_Timestamp;
@@ -88,16 +91,6 @@ public class HKOData {
     public AnimationDrawable Radar_Animation64;
     public AnimationDrawable Radar_Animation128;
     public AnimationDrawable Radar_Animation256;
-
-    //define callback interface
-    public interface BasicSyncCallback {
-        void onProgressUpdate(DataType dataType, int progress, int max);
-        void onSyncFinished(DataType dataType, boolean success);
-    }
-
-    public enum DataType {
-        METAR, TAF, SIGMET, LOCAL, RADAR, RADAR64, RADAR128, RADAR256
-    }
 
     public HKOData(final Context context, final BasicSyncCallback callback) {
 
@@ -186,22 +179,10 @@ public class HKOData {
 
 
     // -------------------------
-    private static String readStream(InputStream in) {
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
-            String nextLine;
-            while ((nextLine = reader.readLine()) != null) {
-                sb.append(nextLine).append("\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
-    }
-
     private class FillMETARCodeTask extends AsyncTask<Void, Integer, Void> {
         protected Void doInBackground(Void... params) {
             try {
+                // HKO's SSL certificate is invalid (?)
                 URL url = new URL("http://www.hko.gov.hk/aviat/wxobs_decode_e.htm");
 
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -225,7 +206,8 @@ public class HKOData {
                 // html
                 //<table width='100%' border="1"... <p><table><tr>
 
-                startPos = HTML.indexOf("<p>Aviation weather report (METAR)");
+                startPos = HTML.indexOf("Decoded METAR/SPECI");
+                startPos = HTML.indexOf("<p>", startPos);
                 endPos = HTML.indexOf("<p><table><tr>", startPos);
 
                 if (startPos < 0 || endPos < startPos) {

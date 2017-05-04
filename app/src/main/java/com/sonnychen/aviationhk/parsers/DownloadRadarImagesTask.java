@@ -47,11 +47,11 @@ import static com.sonnychen.aviationhk.BaseApplication.RADAR_FRAME_DURATION;
 
 public class DownloadRadarImagesTask extends AsyncTask<Void, Integer, Boolean> {
     private Context context;
-    private HKOData.DataType dataType;
-    HKOData.BasicSyncCallback callback;
+    private BasicSyncCallback.DataType dataType;
+    BasicSyncCallback callback;
     private HKOData data;
 
-    public DownloadRadarImagesTask(Context context, HKOData.DataType dataType, HKOData data, final HKOData.BasicSyncCallback callback) {
+    public DownloadRadarImagesTask(Context context, BasicSyncCallback.DataType dataType, HKOData data, final BasicSyncCallback callback) {
         this.context = context;
         this.dataType = dataType;
         this.data = data;
@@ -69,7 +69,7 @@ public class DownloadRadarImagesTask extends AsyncTask<Void, Integer, Boolean> {
         try {
             int count = 0;
             // build animation
-            if (dataType == HKOData.DataType.RADAR64) {
+            if (dataType == BasicSyncCallback.DataType.RADAR64) {
                 data.Radar_Animation64 = new AnimationDrawable();
                 for (String url : data.Radar_Animation64URLs) {
                     Bitmap bitmap = DownloadImage(url);
@@ -79,7 +79,7 @@ public class DownloadRadarImagesTask extends AsyncTask<Void, Integer, Boolean> {
                 }
             }
 //                Radar_Animation64.setOneShot(false);
-            if (dataType == HKOData.DataType.RADAR128) {
+            if (dataType == BasicSyncCallback.DataType.RADAR128) {
                 data.Radar_Animation128 = new AnimationDrawable();
                 for (String url : data.Radar_Animation128URLs) {
                     Bitmap bitmap = DownloadImage(url);
@@ -89,7 +89,7 @@ public class DownloadRadarImagesTask extends AsyncTask<Void, Integer, Boolean> {
                 }
             }
 //                Radar_Animation128.setOneShot(false);
-            if (dataType == HKOData.DataType.RADAR256) {
+            if (dataType == BasicSyncCallback.DataType.RADAR256) {
                 data.Radar_Animation256 = new AnimationDrawable();
                 for (String url : data.Radar_Animation256URLs) {
                     Bitmap bitmap = DownloadImage(url);

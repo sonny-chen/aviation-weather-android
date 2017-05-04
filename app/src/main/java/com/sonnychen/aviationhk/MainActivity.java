@@ -35,7 +35,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -43,7 +42,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.sonnychen.aviationhk.parsers.HKOData;
+import com.sonnychen.aviationhk.parsers.BasicSyncCallback;
 import com.sonnychen.aviationhk.views.CustomFragmentBase;
 import com.sonnychen.aviationhk.views.HomeFragment;
 import com.sonnychen.aviationhk.views.LocalFragment;
@@ -162,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             // wait for METAR to finish before loading UI
-            if (intent.hasExtra(BaseApplication.SYNC_EVENT_PARAM) && intent.getStringExtra(BaseApplication.SYNC_EVENT_PARAM).equals(HKOData.DataType.METAR.toString()))
+            if (intent.hasExtra(BaseApplication.SYNC_EVENT_PARAM) && intent.getStringExtra(BaseApplication.SYNC_EVENT_PARAM).equals(BasicSyncCallback.DataType.METAR.toString()))
                 bindUI();
         }
     };

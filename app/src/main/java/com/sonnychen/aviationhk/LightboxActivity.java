@@ -39,6 +39,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import com.sonnychen.aviationhk.parsers.BasicSyncCallback;
 import com.sonnychen.aviationhk.parsers.DownloadRadarImagesTask;
 import com.sonnychen.aviationhk.parsers.HKOData;
 import com.sonnychen.aviationhk.utils.ExtendedViewPager;
@@ -133,7 +134,7 @@ public class LightboxActivity extends Activity {
                             if (BaseApplication.Data.Radar_Animation128 == null
                                     || BaseApplication.Data.Radar_Animation128.getNumberOfFrames() == 0)
                                 // images not downloaded yet
-                                downloadRadarImages(HKOData.DataType.RADAR128, imgView);
+                                downloadRadarImages(BasicSyncCallback.DataType.RADAR128, imgView);
                             else {
                                 // images available locally
                                 imgView.setImageDrawable(BaseApplication.Data.Radar_Animation128);
@@ -143,7 +144,7 @@ public class LightboxActivity extends Activity {
                             if (BaseApplication.Data.Radar_Animation256 == null
                                     || BaseApplication.Data.Radar_Animation256.getNumberOfFrames() == 0)
                                 // images not downloaded yet
-                                downloadRadarImages(HKOData.DataType.RADAR256, imgView);
+                                downloadRadarImages(BasicSyncCallback.DataType.RADAR256, imgView);
                             else {
                                 // images available locally
                                 imgView.setImageDrawable(BaseApplication.Data.Radar_Animation256);
@@ -199,17 +200,17 @@ public class LightboxActivity extends Activity {
             return imgView;
         }
 
-        private void downloadRadarImages(HKOData.DataType dataType, final ImageView imgView) {
+        private void downloadRadarImages(BasicSyncCallback.DataType dataType, final ImageView imgView) {
             final ProgressDialog progress = new ProgressDialog(LightboxActivity.this);
-            final DownloadRadarImagesTask task = new DownloadRadarImagesTask(LightboxActivity.this, dataType, BaseApplication.Data, new HKOData.BasicSyncCallback() {
+            final DownloadRadarImagesTask task = new DownloadRadarImagesTask(LightboxActivity.this, dataType, BaseApplication.Data, new BasicSyncCallback() {
 
                 @Override
-                public void onProgressUpdate(HKOData.DataType dataType, int progress_value, int max) {
+                public void onProgressUpdate(BasicSyncCallback.DataType dataType, int progress_value, int max) {
                     progress.setProgress(progress_value);
                 }
 
                 @Override
-                public void onSyncFinished(HKOData.DataType dataType, boolean success) {
+                public void onSyncFinished(BasicSyncCallback.DataType dataType, boolean success) {
                     progress.dismiss();
                     if (success) {
                         switch (dataType)
