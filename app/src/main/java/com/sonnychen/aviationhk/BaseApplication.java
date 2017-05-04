@@ -32,7 +32,9 @@ import android.content.res.Configuration;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.sonnychen.aviationhk.parsers.BasicSyncCallback;
 import com.sonnychen.aviationhk.parsers.HKOData;
+import com.sonnychen.aviationhk.parsers.HKORss;
 import com.sonnychen.aviationhk.utils.SimpleCache;
 
 import java.io.IOException;
@@ -44,6 +46,9 @@ public class BaseApplication extends Application {
     public static final String SYNC_EVENT = "SYNC";
     public static final String SYNC_EVENT_PARAM = "EVENT";
 
+    // RSS data
+    public static HKORss RssData;
+    // HTML parsed data
     public static HKOData Data;
     public static SimpleCache Cache;
 
@@ -63,14 +68,28 @@ public class BaseApplication extends Application {
             e.printStackTrace();
         }
 
-        BaseApplication.Data = new HKOData(this, new HKOData.BasicSyncCallback() {
+        BaseApplication.Data = new HKOData(this, new BasicSyncCallback() {
             @Override
-            public void onProgressUpdate(HKOData.DataType dataType, int progress, int max) {
+            public void onProgressUpdate(DataType dataType, int progress, int max) {
 
             }
 
             @Override
-            public void onSyncFinished(HKOData.DataType dataType, boolean success) {
+            public void onSyncFinished(DataType dataType, boolean success) {
+                Intent intent = new Intent(SYNC_EVENT);
+                intent.putExtra(SYNC_EVENT_PARAM, dataType.toString());
+                LocalBroadcastManager.getInstance(BaseApplication.this).sendBroadcast(intent);
+            }
+        });
+
+        BaseApplication.RssData = new HKORss(this, new BasicSyncCallback() {
+            @Override
+            public void onProgressUpdate(DataType dataType, int progress, int max) {
+
+            }
+
+            @Override
+            public void onSyncFinished(DataType dataType, boolean success) {
                 Intent intent = new Intent(SYNC_EVENT);
                 intent.putExtra(SYNC_EVENT_PARAM, dataType.toString());
                 LocalBroadcastManager.getInstance(BaseApplication.this).sendBroadcast(intent);

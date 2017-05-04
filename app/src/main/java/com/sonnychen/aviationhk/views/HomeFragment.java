@@ -25,6 +25,8 @@ package com.sonnychen.aviationhk.views;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +36,8 @@ import android.widget.TextView;
 import com.sonnychen.aviationhk.BaseApplication;
 import com.sonnychen.aviationhk.R;
 import com.sonnychen.aviationhk.utils.Utils;
+
+import java.util.Arrays;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,11 +65,17 @@ public class HomeFragment extends CustomFragmentBase {
         super.onCreate(savedInstanceState);
     }
 
+    // HTML parsed
     TextView mWind;
     TextView mQNH;
     TextView mWeather;
     TextView mCloudBase;
     TextView mVisibility;
+
+    // RSS
+    TextView mLocalForecast;
+    TextView mExtendedForecast;
+    TextView mWeatherWarnings;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,40 +87,53 @@ public class HomeFragment extends CustomFragmentBase {
         mQNH.setText(BaseApplication.Data.METAR_QNH);
         mWeather = ((TextView) view.findViewById(R.id.txtWeather));
         mWeather.setText(BaseApplication.Data.METAR_Weather);
+        mWeatherWarnings = ((TextView) view.findViewById(R.id.txtWeatherWarnings));
+        mWeatherWarnings.setText(Html.fromHtml(Arrays.toString(BaseApplication.RssData.WeatherWarnings)));
+        mLocalForecast = ((TextView) view.findViewById(R.id.txtLocalForecast));
+        mLocalForecast.setText(Html.fromHtml(BaseApplication.RssData.LocalWeatherForecastDescription));
+        mExtendedForecast = ((TextView) view.findViewById(R.id.txtExtendedForecast));
+        mExtendedForecast.setText(Html.fromHtml(BaseApplication.RssData.SeveralDaysWeatherForecastDescription));
 
+        String[] data;
         // set label colors
         mWind = ((TextView) view.findViewById(R.id.txtWind));
-        mWind.setText(BaseApplication.Data.METAR_Wind);
-        String[] data = BaseApplication.Data.METAR_Wind.split(" ");
-        if (Utils.isInteger(data[0], 10)) {
-            // minima: 2000 ft SEC, 1200 ft SKARA
-            int value = Integer.parseInt(data[0]);
-            if (value > 20) mWind.setTextColor(Color.RED);
-            else mWind.setTextColor(Color.BLACK);
-        } else mWind.setTextColor(Color.BLACK);
+        if (!TextUtils.isEmpty(BaseApplication.Data.METAR_Wind)) {
+            mWind.setText(BaseApplication.Data.METAR_Wind);
+            data = BaseApplication.Data.METAR_Wind.split(" ");
+            if (Utils.isInteger(data[0], 10)) {
+                // minima: 2000 ft SEC, 1200 ft SKARA
+                int value = Integer.parseInt(data[0]);
+                if (value > 20) mWind.setTextColor(Color.RED);
+                else mWind.setTextColor(Color.BLACK);
+            } else mWind.setTextColor(Color.BLACK);
+        }
 
         mCloudBase = ((TextView) view.findViewById(R.id.txtCloud));
-        mCloudBase.setText(BaseApplication.Data.METAR_CloudBase);
-        data = BaseApplication.Data.METAR_CloudBase.split(" ");
-        if (Utils.isInteger(data[0], 10)) {
-            // minima: 2000 ft SEC, 1200 ft SKARA
-            int value = Integer.parseInt(data[0]);
-            if (value > 2000) mCloudBase.setTextColor(Color.parseColor("#006600"));
-            else if (value > 1200) mCloudBase.setTextColor(Color.parseColor("#e67300"));
-            else mCloudBase.setTextColor(Color.RED);
-        } else mCloudBase.setTextColor(Color.BLACK);
+        if (!TextUtils.isEmpty(BaseApplication.Data.METAR_CloudBase)) {
+            mCloudBase.setText(BaseApplication.Data.METAR_CloudBase);
+            data = BaseApplication.Data.METAR_CloudBase.split(" ");
+            if (Utils.isInteger(data[0], 10)) {
+                // minima: 2000 ft SEC, 1200 ft SKARA
+                int value = Integer.parseInt(data[0]);
+                if (value > 2000) mCloudBase.setTextColor(Color.parseColor("#006600"));
+                else if (value > 1200) mCloudBase.setTextColor(Color.parseColor("#e67300"));
+                else mCloudBase.setTextColor(Color.RED);
+            } else mCloudBase.setTextColor(Color.BLACK);
+        }
 
         mVisibility = ((TextView) view.findViewById(R.id.txtVisibility));
-        mVisibility.setText(BaseApplication.Data.METAR_Visibility);
-        data = BaseApplication.Data.METAR_Visibility.split(" ");
-        if (Utils.isInteger(data[0], 10)) {
-            // data format: 7 km 3000 m
-            // minima: 5 km SKARA/SEC
-            int value = Integer.parseInt(data[0]);
-            if (value > 3 && value <= 10) mVisibility.setTextColor(Color.parseColor("#006600"));
-            else if (value == 3000) mVisibility.setTextColor(Color.parseColor("#e67300"));
-            else mVisibility.setTextColor(Color.RED);
-        } else mVisibility.setTextColor(Color.BLACK);
+        if (!TextUtils.isEmpty(BaseApplication.Data.METAR_Visibility)) {
+            mVisibility.setText(BaseApplication.Data.METAR_Visibility);
+            data = BaseApplication.Data.METAR_Visibility.split(" ");
+            if (Utils.isInteger(data[0], 10)) {
+                // data format: 7 km 3000 m
+                // minima: 5 km SKARA/SEC
+                int value = Integer.parseInt(data[0]);
+                if (value > 3 && value <= 10) mVisibility.setTextColor(Color.parseColor("#006600"));
+                else if (value == 3000) mVisibility.setTextColor(Color.parseColor("#e67300"));
+                else mVisibility.setTextColor(Color.RED);
+            } else mVisibility.setTextColor(Color.BLACK);
+        }
 
         return view;
     }
