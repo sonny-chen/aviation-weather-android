@@ -201,7 +201,7 @@ public class LightboxActivity extends Activity {
         }
 
         private void downloadRadarImages(BasicSyncCallback.DataType dataType, final ImageView imgView) {
-            final ProgressDialog progress = new ProgressDialog(LightboxActivity.this);
+            final ProgressDialog progress = new ProgressDialog(LightboxActivity.this, android.R.style.Theme_Material_Light_Dialog);
             final DownloadRadarImagesTask task = new DownloadRadarImagesTask(LightboxActivity.this, dataType, BaseApplication.Data, new BasicSyncCallback() {
 
                 @Override
@@ -232,6 +232,7 @@ public class LightboxActivity extends Activity {
                 }
             });
 
+            progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             progress.setIndeterminate(false);
             progress.setMax(BaseApplication.Data.Radar_Animation128URLs.size());
             progress.setTitle(getString(R.string.downloading_radar_image_sequence));
