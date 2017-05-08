@@ -28,11 +28,13 @@ import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sonnychen.aviationhk.AsyncImageTask;
@@ -137,11 +139,11 @@ public class GenericRecyclerViewAdapter extends RecyclerView.Adapter<GenericRecy
     }
 
     class CustomViewHolder extends RecyclerView.ViewHolder {
-        protected ImageView imageView;
-        protected TextView textView;
-        protected ProgressBar progressBar;
+        ImageView imageView;
+        TextView textView;
+        ProgressBar progressBar;
 
-        public CustomViewHolder(View view) {
+        CustomViewHolder(View view) {
             super(view);
             this.imageView = (ImageView) view.findViewById(R.id.imageView);
             this.textView = (TextView) view.findViewById(R.id.title);

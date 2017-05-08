@@ -27,6 +27,14 @@
             android:text=""/>
 
         <TextView
+            android:id="@+id/txtVHSKWind"
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text=""/>
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
@@ -36,6 +44,14 @@
         <TextView
             android:id="@+id/txtVisibility"
             style="@style/Base.TextAppearance.AppCompat.Headline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text=""/>
+
+        <TextView
+            android:id="@+id/txtVisibilityLocal"
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
@@ -84,6 +100,27 @@
             android:text=""/>
 
         <TextView
+            android:id="@+id/txtVHSKPressure"
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text=""/>
+
+        <TextView
+            android:id="@+id/txtVHSKTemperature"
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text=""/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/extendedForecasts"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
@@ -95,18 +132,20 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text=""/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:text="@string/extended_forecast"/>
+            android:text="@string/general_situation"/>
 
         <TextView
-            android:id="@+id/txtExtendedForecast"
+            android:id="@+id/txtGeneralSituation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text=""/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

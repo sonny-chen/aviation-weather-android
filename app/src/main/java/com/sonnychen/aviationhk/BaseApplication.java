@@ -22,10 +22,6 @@
 
 package com.sonnychen.aviationhk;
 
-/**
- * Created by Sonny on 4/25/2017.
- */
-
 import android.app.Application;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -76,6 +72,8 @@ public class BaseApplication extends Application {
 
             @Override
             public void onSyncFinished(DataType dataType, boolean success) {
+                if (!success) return;
+
                 Intent intent = new Intent(SYNC_EVENT);
                 intent.putExtra(SYNC_EVENT_PARAM, dataType.toString());
                 LocalBroadcastManager.getInstance(BaseApplication.this).sendBroadcast(intent);

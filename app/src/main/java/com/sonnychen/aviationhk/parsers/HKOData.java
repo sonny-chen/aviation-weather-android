@@ -23,36 +23,31 @@
 package com.sonnychen.aviationhk.parsers;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.sonnychen.aviationhk.BaseApplication;
 import com.sonnychen.aviationhk.parsers.BasicSyncCallback.DataType;
-import com.sonnychen.aviationhk.utils.SimpleCache;
 
-import java.io.BufferedReader;
+import org.apache.commons.lang3.math.NumberUtils;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Random;
 
 import static com.sonnychen.aviationhk.utils.DownloadUtils.readStream;
 
 public class HKOData {
+    private static final int RUNWAY_DIRECTION = 110;
+    private static final double KNOT_OVER_KM = 0.539956803456D;
+
     public Date METAR_Timestamp;
     public String METAR_Date;
     public String METAR_Code;
@@ -91,6 +86,21 @@ public class HKOData {
     public AnimationDrawable Radar_Animation64;
     public AnimationDrawable Radar_Animation128;
     public AnimationDrawable Radar_Animation256;
+
+    public Date RegionalWeather_Timestamp;
+    public double VHSK_Temperature_Celsius;
+    public double VHSK_RH;
+    public double VHSK_TemperatureMax_Celsius;
+    public double VHSK_TemperatureMin_Celsius;
+    public String VHSK_WindDirection;
+    public double VHSK_Wind_Knots;
+    public double VHSK_Gust_Knots;
+    public double VHSK_CrossWind_Knots;
+    public double VHSK_CrossWindMax_Knots;
+    public double VHSK_CrossWindAverage_Knots;
+    public double VHSK_Pressure_hPa;
+
+    public Visibility[] VisibilityReadings;
 
     public HKOData(final Context context, final BasicSyncCallback callback) {
 
@@ -134,9 +144,9 @@ public class HKOData {
 
         new FillMETARCodeTask() {
             @Override
-            protected void onPostExecute(Void data) {
+            protected void onPostExecute(Boolean result) {
                 METAR_Timestamp = new Date();
-                callback.onSyncFinished(DataType.METAR, METAR_Code != null && !METAR_Code.isEmpty());
+                callback.onSyncFinished(DataType.METAR, result);
             }
         }.execute();
         new FillTAFCodeTask() {
@@ -170,17 +180,25 @@ public class HKOData {
                 new DownloadRadarImagesTask(context, DataType.RADAR64, HKOData.this, callback) {
                     @Override
                     protected void onPostExecute(Boolean success) {
-                        if (success) callback.onSyncFinished(DataType.RADAR, Radar_Animation64URLs != null && Radar_Animation64URLs.size() > 0);
+                        if (success)
+                            callback.onSyncFinished(DataType.RADAR, Radar_Animation64URLs != null && Radar_Animation64URLs.size() > 0);
                     }
                 }.execute();
+            }
+        }.execute();
+        new FillRegionalWeatherTask() {
+            @Override
+            protected void onPostExecute(Void data) {
+                RegionalWeather_Timestamp = new Date();
+                callback.onSyncFinished(DataType.VHSK, VHSK_WindDirection != null && !VHSK_WindDirection.isEmpty());
             }
         }.execute();
     }
 
 
     // -------------------------
-    private class FillMETARCodeTask extends AsyncTask<Void, Integer, Void> {
-        protected Void doInBackground(Void... params) {
+    private class FillMETARCodeTask extends AsyncTask<Void, Integer, Boolean> {
+        protected Boolean doInBackground(Void... params) {
             try {
                 // HKO's SSL certificate is invalid (?)
                 URL url = new URL("http://www.hko.gov.hk/aviat/wxobs_decode_e.htm");
@@ -270,12 +288,13 @@ public class HKOData {
 
                 Log.v("Parser-METAR", METAR_Date);
                 Log.v("Parser-METAR", METAR_Code);
+                return true;
             } catch (Exception e) {
                 e.printStackTrace();
             }
             //publishProgress((int) ((i / (float) count) * 100));
             // Escape early if cancel() is called
-            return null;
+            return false;
         }
     }
 
@@ -459,6 +478,153 @@ public class HKOData {
                 Log.v("Parser-Radar", Radar_Animation64URLs.toString());
 
             } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //publishProgress((int) ((i / (float) count) * 100));
+            // Escape early if cancel() is called
+            return null;
+        }
+    }
+
+    public class Visibility {
+        public String Location;
+        public double Visibility_10min_KM;
+    }
+
+    private class FillRegionalWeatherTask extends AsyncTask<Void, Integer, Void> {
+        protected Void doInBackground(Void... params) {
+            try {
+                //TODO: VHSK forecast wind/dir: http://maps.weather.gov.hk/ocf/text_e.html?mode=0&station=SEK# calculate VHSK c/w component
+
+                // HKO's SSL certificate is invalid (?)
+                URL url = new URL("http://www.hko.gov.hk/wxinfo/ts/text_readings_e.htm");
+
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                String HTML = readStream(con.getInputStream());
+
+                //Shek Kong                      28.4       74        29.6 / 24.4
+                int startPos = HTML.indexOf("Shek Kong");
+                int endPos = HTML.indexOf("\n", startPos); // find the first line break
+                if (startPos < 0 || endPos < startPos) {
+                    Log.wtf("Parser-Regional1-Fail", HTML);
+                    return null;
+                }
+
+                String data_line = HTML.substring(startPos, endPos).replaceAll("<[^>]*>", "");
+
+                String rawvalue = data_line.substring(30, 36).trim();
+                if (NumberUtils.isCreatable(rawvalue))
+                    VHSK_Temperature_Celsius = Double.parseDouble(rawvalue);
+
+                rawvalue = data_line.substring(41, 45).trim();
+                if (NumberUtils.isCreatable(rawvalue))
+                    VHSK_RH = Double.parseDouble(rawvalue);
+
+                rawvalue = data_line.substring(51).trim();
+                String[] subvalues = rawvalue.split("/");
+                if (NumberUtils.isCreatable(subvalues[0].trim()))
+                    VHSK_TemperatureMax_Celsius = Double.parseDouble(subvalues[0].trim());
+                if (subvalues.length > 1 && NumberUtils.isCreatable(subvalues[1].trim()))
+                    VHSK_TemperatureMin_Celsius = Double.parseDouble(subvalues[1].trim());
+
+                //Shek Kong             Southeast      4    14
+                startPos = HTML.indexOf("Shek Kong", endPos);
+                endPos = HTML.indexOf("\n", startPos); // find the first line break
+                if (startPos < 0 || endPos < startPos) {
+                    Log.wtf("Parser-Regional2-Fail", HTML);
+                    return null;
+                }
+
+                data_line = HTML.substring(startPos, endPos).replaceAll("<[^>]*>", "");
+                VHSK_WindDirection = data_line.substring(21, 33).trim();
+
+                double windDirection;
+                switch (VHSK_WindDirection.toLowerCase()) {
+                    case "East":
+                        windDirection = 90;
+                        break;
+                    case "South":
+                        windDirection = 180;
+                        break;
+                    case "West":
+                        windDirection = 270;
+                        break;
+                    case "Northeast":
+                        windDirection = 45;
+                        break;
+                    case "Northwest":
+                        windDirection = 315;
+                        break;
+                    case "Southeast":
+                        windDirection = 135;
+                        break;
+                    case "Southwest":
+                        windDirection = 225;
+                        break;
+                    case "North":
+                    default:
+                        windDirection = 0;
+                        break;
+                }
+
+                rawvalue = data_line.substring(36, 40).trim();
+                if (NumberUtils.isCreatable(rawvalue)) {
+                    VHSK_Wind_Knots = Double.parseDouble(rawvalue) * KNOT_OVER_KM;
+                    VHSK_CrossWind_Knots = Math.sin((windDirection > 180 ? windDirection - 180 : windDirection) - RUNWAY_DIRECTION) * VHSK_Wind_Knots;
+                }
+
+                rawvalue = data_line.substring(41).trim();
+                if (NumberUtils.isCreatable(rawvalue)) {
+                    VHSK_Gust_Knots = Double.parseDouble(rawvalue) * KNOT_OVER_KM;
+                    VHSK_CrossWindMax_Knots = Math.sin((windDirection > 180 ? windDirection - 180 : windDirection) - RUNWAY_DIRECTION) * VHSK_CrossWindMax_Knots;
+                    VHSK_CrossWindAverage_Knots = Math.sin((windDirection > 180 ? windDirection - 180 : windDirection) - RUNWAY_DIRECTION) * (VHSK_Wind_Knots + VHSK_CrossWindAverage_Knots) / 2D;
+                }
+
+                //Shek Kong              1010.0
+                startPos = HTML.indexOf("Shek Kong", endPos);
+                endPos = HTML.indexOf("\n", startPos); // find the first line break
+                if (startPos < 0 || endPos < startPos) {
+                    Log.wtf("Parser-Regional3-Fail", HTML);
+                    return null;
+                }
+
+                data_line = HTML.substring(startPos, endPos).replaceAll("<[^>]*>", "");
+                rawvalue = data_line.substring(22).trim();
+                if (NumberUtils.isCreatable(rawvalue))
+                    VHSK_Pressure_hPa = Double.parseDouble(rawvalue);
+
+//                10-Minute Mean Visibility
+//                Central             7 km
+//                Chek Lap Kok       17 km
+//                Sai Wan Ho          8 km
+//                Waglan Island       7 km
+                startPos = HTML.indexOf("10-Minute Mean Visibility", endPos);
+                startPos = HTML.indexOf("\n", startPos) + 1;
+                endPos = HTML.indexOf("Global Solar", startPos); // find the first line break
+                if (startPos < 0 || endPos < startPos) {
+                    Log.wtf("Parser-Regional4-Fail", HTML);
+                    return null;
+                }
+
+                String[] data_lines = HTML.substring(startPos, endPos).replaceAll("<[^>]*>", "").trim().split("\n");
+                List<Visibility> visibilities = new ArrayList<>();
+                for (String line : data_lines) {
+                    if (line.length() < 20) continue;
+                    Visibility visibility = new Visibility();
+                    visibility.Location = line.substring(0, 17).trim();
+                    rawvalue = line.substring(17).replace(" km", "").trim();
+                    if (NumberUtils.isCreatable(rawvalue))
+                        visibility.Visibility_10min_KM = Double.parseDouble(rawvalue);
+                    if (visibility.Visibility_10min_KM > 100) // visibility under 5km may be expressed in meters
+                        visibility.Visibility_10min_KM /= 100;
+
+                    visibilities.add(visibility);
+                }
+                VisibilityReadings = visibilities.toArray(new Visibility[visibilities.size()]);
+
+                Log.v("Parser-Visibility", Arrays.toString(VisibilityReadings));
+                Log.v("Parser-VHSK", VHSK_WindDirection.concat(" ").concat(VHSK_Wind_Knots + "").concat(" kts"));
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             //publishProgress((int) ((i / (float) count) * 100));

@@ -32,4 +32,5 @@ dependencies {
     compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.einmalfel:earl:1.2.0'
+    compile 'org.apache.commons:commons-lang3:3.5'
 }

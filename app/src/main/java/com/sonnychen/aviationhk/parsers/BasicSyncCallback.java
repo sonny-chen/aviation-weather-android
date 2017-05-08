@@ -28,6 +28,6 @@ public interface BasicSyncCallback {
     void onSyncFinished(DataType dataType, boolean success);
 
     enum DataType {
-        METAR, TAF, SIGMET, LOCAL, RADAR, RADAR64, RADAR128, RADAR256, RSS
+        METAR, TAF, SIGMET, LOCAL, RADAR, RADAR64, RADAR128, RADAR256, FORECASTS, WEATHER_WARNINGS, VHSK
     }
 }

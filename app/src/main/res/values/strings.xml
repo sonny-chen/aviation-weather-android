@@ -24,4 +24,8 @@
     <string name="local_forecast">Local Forecast</string>
     <string name="extended_forecast">Extended Forecast</string>
     <string name="weather_warnings">Weather Warnings</string>
+    <string name="general_situation">General Situation</string>
+    <string name="view_bookings">View Bookings</string>
+    <string name="vhsk">VHSK</string>
+    <string name="image">Image</string>
 </resources>

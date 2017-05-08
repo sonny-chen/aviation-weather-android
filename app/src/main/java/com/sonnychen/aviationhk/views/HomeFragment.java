@@ -1,30 +1,40 @@
 /**
- This file is part of AviationHK - companion app for local pilots
- that provides at-a-glance weather information.
-
- Project site: https://github.com/sonny-chen/aviation-weather-android
-
- AviationHK is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- AviationHK is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with AviationHK.  If not, see <http://www.gnu.org/licenses/>.
-
- Created by Sonny Chen on 4/25/2017.
+ * This file is part of AviationHK - companion app for local pilots
+ * that provides at-a-glance weather information.
+ * <p>
+ * Project site: https://github.com/sonny-chen/aviation-weather-android
+ * <p>
+ * AviationHK is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * AviationHK is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with AviationHK.  If not, see <http://www.gnu.org/licenses/>.
+ * <p>
+ * Created by Sonny Chen on 4/25/2017.
  **/
 
 package com.sonnychen.aviationhk.views;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.util.Pair;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -35,9 +45,22 @@ import android.widget.TextView;
 
 import com.sonnychen.aviationhk.BaseApplication;
 import com.sonnychen.aviationhk.R;
+import com.sonnychen.aviationhk.parsers.BasicSyncCallback;
+import com.sonnychen.aviationhk.parsers.BasicSyncCallback.DataType;
+import com.sonnychen.aviationhk.parsers.HKOData;
+import com.sonnychen.aviationhk.parsers.HKORss;
+import com.sonnychen.aviationhk.utils.GenericCardItem;
+import com.sonnychen.aviationhk.utils.GenericRecyclerViewAdapter;
 import com.sonnychen.aviationhk.utils.Utils;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
+
+import static com.sonnychen.aviationhk.parsers.BasicSyncCallback.DataType.*;
+import static com.sonnychen.aviationhk.parsers.BasicSyncCallback.DataType.FORECASTS;
+import static com.sonnychen.aviationhk.utils.Utils.getMaxNumberOfFittedColumns;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -71,11 +94,21 @@ public class HomeFragment extends CustomFragmentBase {
     TextView mWeather;
     TextView mCloudBase;
     TextView mVisibility;
+    TextView mVisibilityLocal;
+
+    TextView mVHSKTemperature;
+    TextView mVHSKWind;
+    TextView mVHSKPressure;
 
     // RSS
     TextView mLocalForecast;
-    TextView mExtendedForecast;
+    TextView mGeneralSituation;
+    RecyclerView mExtendedForecasts;
     TextView mWeatherWarnings;
+
+    // weather forecast
+    ArrayList<GenericCardItem> cardList;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -87,12 +120,18 @@ public class HomeFragment extends CustomFragmentBase {
         mQNH.setText(BaseApplication.Data.METAR_QNH);
         mWeather = ((TextView) view.findViewById(R.id.txtWeather));
         mWeather.setText(BaseApplication.Data.METAR_Weather);
+        mCloudBase = ((TextView) view.findViewById(R.id.txtCloud));
+        if (BaseApplication.Data.METAR_Weather.startsWith("No significant"))
+            mCloudBase.setTextColor(Color.parseColor("#006600"));
+
         mWeatherWarnings = ((TextView) view.findViewById(R.id.txtWeatherWarnings));
         mWeatherWarnings.setText(Html.fromHtml(Arrays.toString(BaseApplication.RssData.WeatherWarnings)));
         mLocalForecast = ((TextView) view.findViewById(R.id.txtLocalForecast));
-        mLocalForecast.setText(Html.fromHtml(BaseApplication.RssData.LocalWeatherForecastDescription));
-        mExtendedForecast = ((TextView) view.findViewById(R.id.txtExtendedForecast));
-        mExtendedForecast.setText(Html.fromHtml(BaseApplication.RssData.SeveralDaysWeatherForecastDescription));
+        if (BaseApplication.RssData.LocalWeatherForecastDescription != null)
+            mLocalForecast.setText(Html.fromHtml(BaseApplication.RssData.LocalWeatherForecastDescription));
+        mGeneralSituation = ((TextView) view.findViewById(R.id.txtLocalForecast));
+        if (BaseApplication.RssData.GeneralSituation != null)
+            mLocalForecast.setText(Html.fromHtml(BaseApplication.RssData.GeneralSituation));
 
         String[] data;
         // set label colors
@@ -135,7 +174,87 @@ public class HomeFragment extends CustomFragmentBase {
             } else mVisibility.setTextColor(Color.BLACK);
         }
 
+        mVisibilityLocal = ((TextView) view.findViewById(R.id.txtVisibilityLocal));
+        mVHSKTemperature = ((TextView) view.findViewById(R.id.txtVHSKTemperature));
+        mVHSKWind = ((TextView) view.findViewById(R.id.txtVHSKWind));
+        mVHSKPressure = ((TextView) view.findViewById(R.id.txtVHSKPressure));
+        mExtendedForecasts = ((RecyclerView) view.findViewById(R.id.extendedForecasts));
+
+        if (BaseApplication.Data.VHSK_Temperature_Celsius > 0)
+            bindVHSKReadings(VHSK);
+        if (BaseApplication.RssData.WeatherForecasts != null)
+            bindVHSKReadings(FORECASTS);
+
+
         return view;
     }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.v("HomeFragment", "Broadcast received: " + intent.toString());
+
+            // wait for METAR to finish before loading UI
+            if (intent.hasExtra(BaseApplication.SYNC_EVENT_PARAM))
+                bindVHSKReadings(valueOf(intent.getStringExtra(BaseApplication.SYNC_EVENT_PARAM)));
+        }
+    };
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // register for sync event broadcasts
+        LocalBroadcastManager.getInstance(context).registerReceiver(broadcastReceiver,
+                new IntentFilter(BaseApplication.SYNC_EVENT));
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
+    }
+
+
+    private void bindVHSKReadings(DataType dataType) {
+        Log.v("HomeFragment", "bindVHSKReadings: " + dataType.toString());
+        switch (dataType)
+        {
+            case FORECASTS:
+                StringBuilder sb = new StringBuilder();
+                for (HKOData.Visibility visibility : BaseApplication.Data.VisibilityReadings)
+                    sb.append(String.format(Locale.ENGLISH, "%s: %.0f km\n", visibility.Location, visibility.Visibility_10min_KM));
+                mVisibilityLocal.setText(sb.toString());
+
+                if (BaseApplication.RssData.WeatherForecasts != null) {
+                    cardList = new ArrayList<>();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("EEE dd/MM", Locale.ENGLISH);
+                    for (HKORss.WeatherForecast forecast : BaseApplication.RssData.WeatherForecasts) {
+                        cardList.add(new GenericCardItem(forecast.Date != null ? forecast.Date.toString() : "", forecast.WeatherCartoonURL, String.format(Locale.ENGLISH, "%s<br />%s<br />%s<br />%s", forecast.Date != null ? dateFormat.format(forecast.Date) : "", forecast.Weather, forecast.TemperatureRange, forecast.Wind)));
+                    }
+                    GridLayoutManager mLayoutManager = new GridLayoutManager(getContext(),
+                            getMaxNumberOfFittedColumns(getActivity(), 100), LinearLayoutManager.VERTICAL, false);
+                    mLayoutManager.setAutoMeasureEnabled(true);
+                    mExtendedForecasts.setLayoutManager(mLayoutManager);
+                    mExtendedForecasts.setHasFixedSize(false);
+                    mExtendedForecasts.setNestedScrollingEnabled(false);
+                    mExtendedForecasts.setAdapter(new GenericRecyclerViewAdapter(getContext(), cardList));
+                }
+                break;
+            case VHSK:
+                mVHSKTemperature.setText(String.format(Locale.ENGLISH, "%.1f°C (%.1f°C ~ %.1f°C)",
+                        BaseApplication.Data.VHSK_Temperature_Celsius,
+                        BaseApplication.Data.VHSK_TemperatureMin_Celsius,
+                        BaseApplication.Data.VHSK_TemperatureMax_Celsius));
+                mVHSKWind.setText(String.format(Locale.ENGLISH, "%s %d kts (c/w %d kts)",
+                        BaseApplication.Data.VHSK_WindDirection,
+                        Math.round(BaseApplication.Data.VHSK_Wind_Knots),
+                        Math.round(BaseApplication.Data.VHSK_CrossWind_Knots)));
+                mVHSKPressure.setText(String.format(Locale.ENGLISH, "%.0f hPa", BaseApplication.Data.VHSK_Pressure_hPa));
+
+                break;
+        }
+    }
+
 
 }

@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/main_menu_view_booking"
+        android:title="@string/view_bookings"/>
+
+    <item
         android:id="@+id/main_menu_about"
         android:icon="@drawable/ic_info"
         android:title="@string/about"/>
