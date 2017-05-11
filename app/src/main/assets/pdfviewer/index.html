@@ -2,31 +2,26 @@
 <html>
 <head>
     <link rel="stylesheet" href="minimal.css"/>
-	   <script type="text/javascript" src="file:///android_asset/pdfviewer/compatibility.js"></script>
-	  <!--  horrible hack needs fix-->
-	    	    	    
-<script type="text/javascript">
+    <script type="text/javascript" src="file:///android_asset/pdfviewer/compatibility.js"></script>
+    <!--  horrible hack needs fix-->
+    <script type="text/javascript">
 var url = 'THE_FILE';
 var pdf_password = 'THE_PASSWORD';
-</script>
+    </script>
 
 </head>
 <body>
-  <div>
+<div>
     <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
-  </div>
-  
-  <div>
+</div>
+
+<div>
     <canvas id="the-canvas" style="border:0px solid black"></canvas>
-  </div>
+</div>
 
-  <!-- Use latest PDF.js build from Github -->
+<!-- Use latest PDF.js build from Github -->
 <script type="text/javascript" src="file:///android_asset/pdfviewer/pdf.js"></script>
+<script type="text/javascript" src="file:///android_asset/pdfviewer/customview.js"></script>
 
-  
-  <script type="text/javascript" src="file:///android_asset/pdfviewer/customview.js"></script> 
- 
-  
-   
 </body>
 </html>

@@ -50,7 +50,7 @@ import java.net.MalformedURLException;
             View v = convertView;
             if (v == null) {
                 LayoutInflater vi = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                v = vi.inflate(R.layout.image_list_item, null);
+                v = vi.inflate(R.layout.card_item_vertical, null);
             }
 
             String url = urls[position];

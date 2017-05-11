@@ -22,6 +22,7 @@
 
 package com.sonnychen.aviationhk.views;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
@@ -31,6 +32,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.sonnychen.aviationhk.BaseApplication;
 import com.sonnychen.aviationhk.utils.GenericCardItem;
@@ -58,8 +60,10 @@ public class RadarFragment extends CustomFragmentBase {
      *
      * @return A new instance of fragment RadarFragment.
      */
-    public static RadarFragment newInstance() {
-        return new RadarFragment();
+    public static RadarFragment newInstance(Context context) {
+        RadarFragment fragment = new RadarFragment();
+        fragment.FragmentTitle = context.getString(R.string.title_radar);
+        return fragment;
     }
 
     private ArrayList<GenericCardItem> cardList;
@@ -87,7 +91,7 @@ public class RadarFragment extends CustomFragmentBase {
         mLayoutManager.setMeasurementCacheEnabled(false);
         mListView.setLayoutManager(mLayoutManager);
         mListView.setHasFixedSize(false);
-        mListView.setAdapter(new GenericRecyclerViewAdapter(getContext(), cardList));
+        mListView.setAdapter(new GenericRecyclerViewAdapter(getContext(), cardList, LinearLayout.VERTICAL));
         return view;
     }
 }

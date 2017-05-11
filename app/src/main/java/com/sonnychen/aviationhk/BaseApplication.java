@@ -24,6 +24,7 @@ package com.sonnychen.aviationhk;
 
 import android.app.Application;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -41,6 +42,7 @@ public class BaseApplication extends Application {
 
     public static final String SYNC_EVENT = "SYNC";
     public static final String SYNC_EVENT_PARAM = "EVENT";
+    public static final String PREFS_NAME = "SETTINGS";
 
     // RSS data
     public static HKORss RssData;
@@ -64,6 +66,11 @@ public class BaseApplication extends Application {
             e.printStackTrace();
         }
 
+        // load settings
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        HKACPassword = settings.getString("HKACPassword", null);
+
+        // init data stores
         BaseApplication.Data = new HKOData(this, new BasicSyncCallback() {
             @Override
             public void onProgressUpdate(DataType dataType, int progress, int max) {

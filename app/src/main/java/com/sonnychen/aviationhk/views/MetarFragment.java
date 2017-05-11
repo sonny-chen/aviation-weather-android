@@ -22,6 +22,7 @@
 
 package com.sonnychen.aviationhk.views;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -52,8 +53,10 @@ public class MetarFragment extends CustomFragmentBase {
      *
      * @return A new instance of fragment MetarFragment.
      */
-    public static MetarFragment newInstance() {
-        return new MetarFragment();
+    public static MetarFragment newInstance(Context context) {
+        MetarFragment fragment = new MetarFragment();
+        fragment.FragmentTitle = context.getString(R.string.title_metartaf);
+        return fragment;
     }
 
     @Override

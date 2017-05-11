@@ -22,6 +22,7 @@
 
 package com.sonnychen.aviationhk.views;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -41,7 +42,7 @@ import com.sonnychen.aviationhk.R;
  * Use the {@link LocalFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LocalFragment extends Fragment {
+public class LocalFragment extends CustomFragmentBase {
     public LocalFragment() {
         // Required empty public constructor
     }
@@ -52,8 +53,10 @@ public class LocalFragment extends Fragment {
      *
      * @return A new instance of fragment LocalFragment.
      */
-    public static LocalFragment newInstance() {
-        return new LocalFragment();
+    public static LocalFragment newInstance(Context context) {
+        LocalFragment fragment = new LocalFragment();
+        fragment.FragmentTitle = context.getString(R.string.title_localaviation);
+        return fragment;
     }
 
     @Override

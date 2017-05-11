@@ -27,6 +27,8 @@ import android.net.Uri;
 import android.support.v4.app.Fragment;
 
 public class CustomFragmentBase extends Fragment {
+    public String FragmentTitle;
+
     public void refreshView() {
         throw new RuntimeException("Stub!");
     }

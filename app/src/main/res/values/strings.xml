@@ -28,4 +28,16 @@
     <string name="view_bookings">View Bookings</string>
     <string name="vhsk">VHSK</string>
     <string name="image">Image</string>
+    <string name="crosswind">x/wind</string>
+    <string name="vhsk_colon">VHSK:</string>
+    <string name="hkac_shared_pdf_secret">HKAC shared PDF password:</string>
+    <string name="error">Error</string>
+    <string name="pdf_password_is_required">PDF password is required.</string>
+    <string name="go">Go</string>
+    <string name="cancel">Cancel</string>
+    <string name="title_booking_helicopter">Helicopter Booking</string>
+    <string name="title_booking_fixedwing">Fixed Wing Booking</string>
+    <string name="password_invalid_prompt">The shared PDF password you entered is invalid. Please try again.</string>
+    <string name="password_incorrect">Password Incorrect</string>
+    <string name="close">Close</string>
 </resources>

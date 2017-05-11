@@ -36,6 +36,8 @@
         </activity>
         <activity android:name=".AboutActivity">
         </activity>
+        <activity android:name=".GenericFragmentHostActivity">
+        </activity>
     </application>
 
 </manifest>

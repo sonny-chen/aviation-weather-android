@@ -94,8 +94,10 @@
       pdfDoc = pdfDoc_;
       document.getElementById('page_count').textContent = pdfDoc.numPages;
 
-      // Initial/first page rendering
-      renderPage(pageNum);
-    });
-    
-   
+      // page rendering
+      for (i=1;i<=pdfDoc.numPages;i++)
+        renderPage(i);
+    }, function getDocumentError(message) {
+        Android.exception(message)
+	}
+	);

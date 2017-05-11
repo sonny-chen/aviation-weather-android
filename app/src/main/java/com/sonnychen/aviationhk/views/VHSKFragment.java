@@ -22,6 +22,7 @@
 
 package com.sonnychen.aviationhk.views;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
@@ -31,6 +32,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.sonnychen.aviationhk.BaseApplication;
 import com.sonnychen.aviationhk.utils.GenericCardItem;
@@ -58,8 +60,10 @@ public class VHSKFragment extends CustomFragmentBase {
      *
      * @return A new instance of fragment VHSKFragment.
      */
-    public static VHSKFragment newInstance() {
-        return new VHSKFragment();
+    public static VHSKFragment newInstance(Context context) {
+        VHSKFragment fragment = new VHSKFragment();
+        fragment.FragmentTitle = context.getString(R.string.title_vhsk);
+        return fragment;
     }
 
     private ArrayList<GenericCardItem> cardList;
@@ -82,7 +86,7 @@ public class VHSKFragment extends CustomFragmentBase {
             cardList.add(new GenericCardItem(cam.first, cam.second, cam.first));
 
         mListView.setLayoutManager(new GridLayoutManager(getContext(), 1, LinearLayoutManager.VERTICAL, false));
-        mListView.setAdapter(new GenericRecyclerViewAdapter(getContext(), cardList));
+        mListView.setAdapter(new GenericRecyclerViewAdapter(getContext(), cardList, LinearLayout.VERTICAL));
         return view;
     }
 }

@@ -22,7 +22,6 @@
 
 package com.sonnychen.aviationhk.views;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -31,7 +30,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.util.Pair;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,11 +39,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sonnychen.aviationhk.BaseApplication;
 import com.sonnychen.aviationhk.R;
-import com.sonnychen.aviationhk.parsers.BasicSyncCallback;
 import com.sonnychen.aviationhk.parsers.BasicSyncCallback.DataType;
 import com.sonnychen.aviationhk.parsers.HKOData;
 import com.sonnychen.aviationhk.parsers.HKORss;
@@ -58,8 +56,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 
-import static com.sonnychen.aviationhk.parsers.BasicSyncCallback.DataType.*;
 import static com.sonnychen.aviationhk.parsers.BasicSyncCallback.DataType.FORECASTS;
+import static com.sonnychen.aviationhk.parsers.BasicSyncCallback.DataType.VHSK;
+import static com.sonnychen.aviationhk.parsers.BasicSyncCallback.DataType.valueOf;
 import static com.sonnychen.aviationhk.utils.Utils.getMaxNumberOfFittedColumns;
 
 /**
@@ -79,8 +78,10 @@ public class HomeFragment extends CustomFragmentBase {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      */
-    public static HomeFragment newInstance() {
-        return new HomeFragment();
+    public static HomeFragment newInstance(Context context) {
+        HomeFragment fragment = new HomeFragment();
+        fragment.FragmentTitle = context.getString(R.string.title_home);
+        return fragment;
     }
 
     @Override
@@ -218,8 +219,7 @@ public class HomeFragment extends CustomFragmentBase {
 
     private void bindVHSKReadings(DataType dataType) {
         Log.v("HomeFragment", "bindVHSKReadings: " + dataType.toString());
-        switch (dataType)
-        {
+        switch (dataType) {
             case FORECASTS:
                 StringBuilder sb = new StringBuilder();
                 for (HKOData.Visibility visibility : BaseApplication.Data.VisibilityReadings)
@@ -230,15 +230,15 @@ public class HomeFragment extends CustomFragmentBase {
                     cardList = new ArrayList<>();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("EEE dd/MM", Locale.ENGLISH);
                     for (HKORss.WeatherForecast forecast : BaseApplication.RssData.WeatherForecasts) {
-                        cardList.add(new GenericCardItem(forecast.Date != null ? forecast.Date.toString() : "", forecast.WeatherCartoonURL, String.format(Locale.ENGLISH, "%s<br />%s<br />%s<br />%s", forecast.Date != null ? dateFormat.format(forecast.Date) : "", forecast.Weather, forecast.TemperatureRange, forecast.Wind)));
+                        cardList.add(new GenericCardItem(forecast.Date != null ? forecast.Date.toString() : "", forecast.WeatherCartoonURL, String.format(Locale.ENGLISH, "%s<br />%s<br /><br />%s<br />%s", forecast.Date != null ? dateFormat.format(forecast.Date) : "", forecast.Weather, forecast.TemperatureRange, forecast.Wind)));
                     }
                     GridLayoutManager mLayoutManager = new GridLayoutManager(getContext(),
                             getMaxNumberOfFittedColumns(getActivity(), 100), LinearLayoutManager.VERTICAL, false);
-                    mLayoutManager.setAutoMeasureEnabled(true);
                     mExtendedForecasts.setLayoutManager(mLayoutManager);
+                    mLayoutManager.setAutoMeasureEnabled(true);
                     mExtendedForecasts.setHasFixedSize(false);
                     mExtendedForecasts.setNestedScrollingEnabled(false);
-                    mExtendedForecasts.setAdapter(new GenericRecyclerViewAdapter(getContext(), cardList));
+                    mExtendedForecasts.setAdapter(new GenericRecyclerViewAdapter(getContext(), cardList, LinearLayout.VERTICAL));
                 }
                 break;
             case VHSK:
@@ -246,10 +246,15 @@ public class HomeFragment extends CustomFragmentBase {
                         BaseApplication.Data.VHSK_Temperature_Celsius,
                         BaseApplication.Data.VHSK_TemperatureMin_Celsius,
                         BaseApplication.Data.VHSK_TemperatureMax_Celsius));
-                mVHSKWind.setText(String.format(Locale.ENGLISH, "%s %d kts (c/w %d kts)",
+                mVHSKWind.setText(String.format(Locale.ENGLISH, "%s %s - %s %s",
                         BaseApplication.Data.VHSK_WindDirection,
-                        Math.round(BaseApplication.Data.VHSK_Wind_Knots),
-                        Math.round(BaseApplication.Data.VHSK_CrossWind_Knots)));
+                        Math.round(BaseApplication.Data.VHSK_Wind_Knots) > 0 ? String.format(Locale.ENGLISH, "%d kts", Math.round(BaseApplication.Data.VHSK_Wind_Knots)) : "",
+                        getString(R.string.crosswind),
+                        Math.round(BaseApplication.Data.VHSK_CrossWind_Knots) > 0 ? String.format(Locale.ENGLISH, "%d kts", Math.round(BaseApplication.Data.VHSK_CrossWind_Knots)) : "nil"));
+
+                // check for weather minimas
+                mVHSKWind.setTextColor((Math.round(BaseApplication.Data.VHSK_Wind_Knots) > 20 || Math.round(BaseApplication.Data.VHSK_CrossWind_Knots) > 15) ? Color.RED : Color.BLACK);
+
                 mVHSKPressure.setText(String.format(Locale.ENGLISH, "%.0f hPa", BaseApplication.Data.VHSK_Pressure_hPa));
 
                 break;

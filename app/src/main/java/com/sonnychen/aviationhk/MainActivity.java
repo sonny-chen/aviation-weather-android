@@ -24,8 +24,10 @@ package com.sonnychen.aviationhk;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -35,14 +37,20 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.sonnychen.aviationhk.parsers.BasicSyncCallback;
+import com.sonnychen.aviationhk.utils.GenericViewPagerAdapter;
+import com.sonnychen.aviationhk.views.BookingFragment;
 import com.sonnychen.aviationhk.views.CustomFragmentBase;
 import com.sonnychen.aviationhk.views.HomeFragment;
 import com.sonnychen.aviationhk.views.LocalFragment;
@@ -50,12 +58,17 @@ import com.sonnychen.aviationhk.views.MetarFragment;
 import com.sonnychen.aviationhk.views.RadarFragment;
 import com.sonnychen.aviationhk.views.VHSKFragment;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.sonnychen.aviationhk.BaseApplication.PREFS_NAME;
+
 public class MainActivity extends AppCompatActivity implements
         CustomFragmentBase.OnFragmentInteractionListener {
 
     ViewPager mViewPager;
     BottomNavigationView mNavigation;
-    MainViewAdapter mAdapter;
+    GenericViewPagerAdapter mAdapter;
     LinearLayout mLoading;
 
     @Override
@@ -90,6 +103,9 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.main_menu_about:
                 startActivity(new Intent(this, AboutActivity.class));
                 return true;
+            case R.id.main_menu_view_booking:
+                showBookings();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -97,7 +113,14 @@ public class MainActivity extends AppCompatActivity implements
 
     private void bindUI() {
 
-        mAdapter = new MainViewAdapter(this.getSupportFragmentManager());
+        List<CustomFragmentBase> fragments = new ArrayList<>();
+        fragments.add(HomeFragment.newInstance(this));
+        fragments.add(RadarFragment.newInstance(this));
+        fragments.add(VHSKFragment.newInstance(this));
+        fragments.add(MetarFragment.newInstance(this));
+        fragments.add(LocalFragment.newInstance(this));
+
+        mAdapter = new GenericViewPagerAdapter(fragments, this.getSupportFragmentManager());
         mViewPager.setAdapter(mAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -137,13 +160,13 @@ public class MainActivity extends AppCompatActivity implements
                         mViewPager.setCurrentItem(4);
                         return true;
                     case R.id.navigation_metartaf:
-                        mViewPager.setCurrentItem(2);
+                        mViewPager.setCurrentItem(3);
                         return true;
                     case R.id.navigation_radar:
                         mViewPager.setCurrentItem(1);
                         return true;
                     case R.id.navigation_vhsk:
-                        mViewPager.setCurrentItem(3);
+                        mViewPager.setCurrentItem(2);
                         return true;
                 }
                 return false;
@@ -187,56 +210,60 @@ public class MainActivity extends AppCompatActivity implements
         // handle inter-fragment navigation here
     }
 
-    private static class MainViewAdapter extends FragmentPagerAdapter {
-        private static int NUM_ITEMS = 5;
-
-        MainViewAdapter(FragmentManager fragmentManager) {
-            super(fragmentManager);
+    public void showBookings() {
+        if (!TextUtils.isEmpty(BaseApplication.HKACPassword)) {
+            launchBookingViewer();
+            return;
         }
 
-        // Returns total number of pages
-        @Override
-        public int getCount() {
-            return NUM_ITEMS;
-        }
+        View promptsView = LayoutInflater.from(this).inflate(R.layout.simple_password_prompt, null);
+        final EditText userInput = (EditText) promptsView.findViewById(R.id.editTextDialogUserInput);
 
-        // Returns the fragment to display for that page
-        @Override
-        public Fragment getItem(int position) {
-            switch (position) {
-                case 0:
-                    return HomeFragment.newInstance();
-                case 1:
-                    return RadarFragment.newInstance();
-                case 2:
-                    return MetarFragment.newInstance();
-                case 3:
-                    return VHSKFragment.newInstance();
-                case 4:
-                    return LocalFragment.newInstance();
-                default:
-                    return null;
-            }
-        }
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setView(promptsView);
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(true)
+                .setPositiveButton(R.string.go,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                /** DO THE METHOD HERE WHEN PROCEED IS CLICKED*/
+                                String password = (userInput.getText()).toString();
 
-        // Returns the page title for the top indicator
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "Overview";
-                case 1:
-                    return "Radar/Sat/Lightning";
-                case 2:
-                    return "Metar/TAF/SIGMET";
-                case 3:
-                    return "Shek Kong";
-                case 4:
-                    return "Local Aviation";
-                default:
-                    return null;
-            }
-        }
+                                /** CHECK FOR USER'S INPUT **/
+                                if (!TextUtils.isEmpty(password)) {
+                                    BaseApplication.HKACPassword = password;
+                                    SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                                    SharedPreferences.Editor editor = settings.edit();
+                                    editor.putString("HKACPassword", BaseApplication.HKACPassword);
+                                    editor.apply();
 
+                                    launchBookingViewer();
+                                } else {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                    builder.setTitle(R.string.error);
+                                    builder.setMessage(R.string.pdf_password_is_required);
+                                    builder.create().show();
+                                }
+                            }
+                        })
+                .setNegativeButton(R.string.cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+
+                        }
+
+                );
+
+        alertDialogBuilder.create().show();
     }
+
+    private void launchBookingViewer() {
+        Intent intent = new Intent(MainActivity.this, GenericFragmentHostActivity.class);
+        intent.putExtra(GenericFragmentHostActivity.FRAGMENT_NAME_PARAM, BookingFragment.class.getName());
+        startActivity(intent);
+    }
+
 }

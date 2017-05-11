@@ -28,13 +28,12 @@ import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.TextUtils;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sonnychen.aviationhk.AsyncImageTask;
@@ -50,18 +49,22 @@ public class GenericRecyclerViewAdapter extends RecyclerView.Adapter<GenericRecy
     private List<GenericCardItem> feedItemList;
     private Context mContext;
     private ArrayList<String> URLs;
+    private int CellLayoutOrientation;
 
-    public GenericRecyclerViewAdapter(Context context, List<GenericCardItem> feedItemList) {
+    public GenericRecyclerViewAdapter(Context context, List<GenericCardItem> feedItemList, int CellLayoutOrientation) {
         this.feedItemList = feedItemList;
         this.mContext = context;
         URLs = new ArrayList<>();
         for (int i = 0; i < feedItemList.size(); i++)
             URLs.add(feedItemList.get(i).ImageURL);
+        this.CellLayoutOrientation = CellLayoutOrientation;
     }
 
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.image_list_item, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(
+                CellLayoutOrientation == LinearLayout.VERTICAL ? R.layout.card_item_vertical :
+                        R.layout.card_item_horizontal, viewGroup, false);
         return new CustomViewHolder(view);
     }
 
