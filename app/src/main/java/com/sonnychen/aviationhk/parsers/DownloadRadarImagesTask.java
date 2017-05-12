@@ -65,6 +65,12 @@ public class DownloadRadarImagesTask extends AsyncTask<Void, Integer, Boolean> {
         if (callback != null) callback.onProgressUpdate(dataType, values[0], values[1]);
     }
 
+    @Override
+    protected void onPostExecute(Boolean result) {
+        if (callback != null)
+            callback.onSyncFinished(dataType, result);
+    }
+
     protected Boolean doInBackground(Void... params) {
         try {
             int count = 0;
