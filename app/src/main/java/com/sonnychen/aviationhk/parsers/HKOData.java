@@ -96,6 +96,7 @@ public class HKOData {
     public double VHSK_Wind_Knots;
     public double VHSK_Gust_Knots;
     public double VHSK_CrossWind_Knots;
+    public double VHSK_CrossWind_Angle;
     public double VHSK_CrossWindMax_Knots;
     public double VHSK_CrossWindAverage_Knots;
     public double VHSK_Pressure_hPa;
@@ -540,44 +541,45 @@ public class HKOData {
 
                 double windDirection;
                 switch (VHSK_WindDirection.toLowerCase()) {
-                    case "East":
+                    case "east":
                         windDirection = 90;
                         break;
-                    case "South":
+                    case "south":
                         windDirection = 180;
                         break;
-                    case "West":
+                    case "west":
                         windDirection = 270;
                         break;
-                    case "Northeast":
+                    case "northeast":
                         windDirection = 45;
                         break;
-                    case "Northwest":
+                    case "northwest":
                         windDirection = 315;
                         break;
-                    case "Southeast":
+                    case "southeast":
                         windDirection = 135;
                         break;
-                    case "Southwest":
+                    case "southwest":
                         windDirection = 225;
                         break;
-                    case "North":
+                    case "north":
                     default:
                         windDirection = 0;
                         break;
                 }
 
+                VHSK_CrossWind_Angle = windDirection - RUNWAY_DIRECTION;
                 rawvalue = data_line.substring(36, 40).trim();
                 if (NumberUtils.isCreatable(rawvalue)) {
                     VHSK_Wind_Knots = Double.parseDouble(rawvalue) * KNOT_OVER_KM;
-                    VHSK_CrossWind_Knots = Math.sin((windDirection > 180 ? windDirection - 180 : windDirection) - RUNWAY_DIRECTION) * VHSK_Wind_Knots;
+                    VHSK_CrossWind_Knots = Math.sin(VHSK_CrossWind_Angle > 180 ? VHSK_CrossWind_Angle - 180 : VHSK_CrossWind_Angle) * VHSK_Wind_Knots;
                 }
 
                 rawvalue = data_line.substring(41).trim();
                 if (NumberUtils.isCreatable(rawvalue)) {
                     VHSK_Gust_Knots = Double.parseDouble(rawvalue) * KNOT_OVER_KM;
-                    VHSK_CrossWindMax_Knots = Math.sin((windDirection > 180 ? windDirection - 180 : windDirection) - RUNWAY_DIRECTION) * VHSK_CrossWindMax_Knots;
-                    VHSK_CrossWindAverage_Knots = Math.sin((windDirection > 180 ? windDirection - 180 : windDirection) - RUNWAY_DIRECTION) * (VHSK_Wind_Knots + VHSK_CrossWindAverage_Knots) / 2D;
+                    VHSK_CrossWindMax_Knots = Math.sin(VHSK_CrossWind_Angle > 180 ? VHSK_CrossWind_Angle - 180 : VHSK_CrossWind_Angle) * VHSK_Gust_Knots;
+                    VHSK_CrossWindAverage_Knots = Math.sin(VHSK_CrossWind_Angle > 180 ? VHSK_CrossWind_Angle - 180 : VHSK_CrossWind_Angle) * (VHSK_Wind_Knots + VHSK_Gust_Knots) / 2D;
                 }
 
                 //Shek Kong              1010.0

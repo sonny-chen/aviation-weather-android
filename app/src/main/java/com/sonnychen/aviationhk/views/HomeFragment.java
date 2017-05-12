@@ -246,11 +246,12 @@ public class HomeFragment extends CustomFragmentBase {
                         BaseApplication.Data.VHSK_Temperature_Celsius,
                         BaseApplication.Data.VHSK_TemperatureMin_Celsius,
                         BaseApplication.Data.VHSK_TemperatureMax_Celsius));
-                mVHSKWind.setText(String.format(Locale.ENGLISH, "%s %s - %s %s",
+                mVHSKWind.setText(String.format(Locale.ENGLISH, "%s %s - %s %s %s",
                         BaseApplication.Data.VHSK_WindDirection,
                         Math.round(BaseApplication.Data.VHSK_Wind_Knots) > 0 ? String.format(Locale.ENGLISH, "%d kts", Math.round(BaseApplication.Data.VHSK_Wind_Knots)) : "",
                         getString(R.string.crosswind),
-                        Math.round(BaseApplication.Data.VHSK_CrossWind_Knots) > 0 ? String.format(Locale.ENGLISH, "%d kts", Math.round(BaseApplication.Data.VHSK_CrossWind_Knots)) : "nil"));
+                        Math.round(BaseApplication.Data.VHSK_CrossWind_Knots) > 0 ? String.format(Locale.ENGLISH, "%d kts", Math.round(BaseApplication.Data.VHSK_CrossWind_Knots)) : "nil",
+                        Math.round(BaseApplication.Data.VHSK_CrossWind_Knots) > 0 ? (BaseApplication.Data.VHSK_CrossWind_Angle < 0 ? "from the left of 11" : "from the right of 11") : ""));
 
                 // check for weather minimas
                 mVHSKWind.setTextColor((Math.round(BaseApplication.Data.VHSK_Wind_Knots) > 20 || Math.round(BaseApplication.Data.VHSK_CrossWind_Knots) > 15) ? Color.RED : Color.BLACK);
