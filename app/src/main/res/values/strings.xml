@@ -40,4 +40,6 @@
     <string name="password_invalid_prompt">The shared PDF password you entered is invalid. Please try again.</string>
     <string name="password_incorrect">Password Incorrect</string>
     <string name="close">Close</string>
+    <string name="data_accuracy_disclaimer">Data in this app is for reference only. You must ensure your information is correct before flying.</string>
+    <string name="contact_author">Contact author:</string>
 </resources>

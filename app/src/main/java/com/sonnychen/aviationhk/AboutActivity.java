@@ -21,5 +21,14 @@ public class AboutActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
+        findViewById(R.id.emailLink).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_SENDTO);
+                intent.setData(Uri.parse("mailto:sonny@inboxalias.com"));
+                startActivity(Intent.createChooser(intent, "Contact by email"));
+            }
+        });
     }
 }
