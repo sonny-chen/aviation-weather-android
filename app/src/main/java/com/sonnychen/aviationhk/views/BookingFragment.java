@@ -128,8 +128,11 @@ public class BookingFragment extends CustomFragmentBase {
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setBuiltInZoomControls(true);
+        settings.setLoadWithOverviewMode(true);
+        settings.setUseWideViewPort(true);
         mWebView.setWebChromeClient(new WebChromeClient());
         mWebView.addJavascriptInterface(new JSInterface(getActivity(), mWebView), "Android");
+        mWebView.setInitialScale(1);
 
         // download PDF async
         new DownloadFileTask() {
@@ -137,7 +140,9 @@ public class BookingFragment extends CustomFragmentBase {
             protected void onPostExecute(Byte[] data) {
                 // save data to file
                 try {
-                    FileOutputStream fileOutputStream = getActivity().openFileOutput("booking.pdf", Context.MODE_PRIVATE);
+                    FileOutputStream fileOutputStream = getActivity().openFileOutput(
+                            bookingType == BookingType.HELICOPTER ? "helicopter.pdf" : "fixedwing.pdf",
+                            Context.MODE_PRIVATE);
                     fileOutputStream.write(getbytes(data));
                     fileOutputStream.close();
                 } catch (IOException e) {
@@ -157,7 +162,8 @@ public class BookingFragment extends CustomFragmentBase {
         mProgressBar.setVisibility(View.VISIBLE);
         mWebView.setVisibility(View.GONE);
 
-        Uri path = Uri.parse(getActivity().getFilesDir() + "/booking.pdf");
+        Uri path = Uri.parse(getActivity().getFilesDir() + "/" +
+                (bookingType == BookingType.HELICOPTER ? "helicopter.pdf" : "fixedwing.pdf"));
         try {
             InputStream ims = getActivity().getAssets().open("pdfviewer/index.html");
             String line = readStream(ims);
@@ -276,6 +282,16 @@ public class BookingFragment extends CustomFragmentBase {
                         }
                     })
                     .create().show();
+        }
+
+        @JavascriptInterface
+        public void pageReady(int pageNum) {
+
+        }
+
+        @JavascriptInterface
+        public void pageCount(int pageCount) {
+
         }
     }
 }
